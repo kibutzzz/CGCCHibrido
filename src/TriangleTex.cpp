@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <filesystem>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Código fonte do Vertex Shader (em GLSL): ainda hardcoded
 const GLchar *vertexShaderSource = R"(
-#version 400
+#version 410
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 texc;
 uniform mat4 projection;
@@ -60,7 +61,7 @@ void main()
 
 // Código fonte do Fragment Shader (em GLSL): ainda hardcoded
 const GLchar *fragmentShaderSource = R"(
-#version 400
+#version 410
 in vec2 texCoord;
 uniform sampler2D texBuff;
 out vec4 color;
@@ -70,23 +71,27 @@ void main()
 })";
 
 // Função MAIN
-int main()
+int main(int argc, char* argv[])
 {
 	// Inicialização da GLFW
 	glfwInit();
+
+	// Resolve assets path relative to the executable location
+	std::filesystem::path exeDir = std::filesystem::path(argv[0]).parent_path();
+	std::string assetsPath = (exeDir / "../assets/tex/pixelWall.png").string();
 
 	// Muita atenção aqui: alguns ambientes não aceitam essas configurações
 	// Você deve adaptar para a versão do OpenGL suportada por sua placa
 	// Sugestão: comente essas linhas de código para desobrir a versão e
 	// depois atualize (por exemplo: 4.5 com 4 e 5)
-	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Essencial para computadores da Apple
-	// #ifdef __APPLE__
-	//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	// #endif
+	#ifdef __APPLE__
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	#endif
 
 	// Criação da janela GLFW
 	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Ola Triangulo Texturizado!", nullptr, nullptr);
@@ -120,7 +125,7 @@ int main()
 
 	// Carregando uma textura e armazenando seu id
 	int imgWidth, imgHeight;
-	GLuint texID = loadTexture("../assets/tex/pixelWall.png",imgWidth,imgHeight);
+	GLuint texID = loadTexture(assetsPath, imgWidth, imgHeight);
 
 	glUseProgram(shaderID);
 
@@ -255,18 +260,18 @@ int setupGeometry()
 	};
 
 	GLuint VBO, VAO;
+	// Geração do identificador do VAO (Vertex Array Object)
+	glGenVertexArrays(1, &VAO);
+	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
+	// e os ponteiros para os atributos
+	glBindVertexArray(VAO);
+
 	// Geração do identificador do VBO
 	glGenBuffers(1, &VBO);
 	// Faz a conexão (vincula) do buffer como um buffer de array
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// Envia os dados do array de floats para o buffer da OpenGl
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Geração do identificador do VAO (Vertex Array Object)
-	glGenVertexArrays(1, &VAO);
-	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
-	// e os ponteiros para os atributos
-	glBindVertexArray(VAO);
 	// Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando:
 	//  Localização no shader * (a localização dos atributos devem ser correspondentes no layout especificado no vertex shader)
 	//  Numero de valores que o atributo tem (por ex, 3 coordenadas xyz)
