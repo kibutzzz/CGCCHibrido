@@ -82,3 +82,8 @@ endforeach()
 add_executable(Hello3DM1 tarefa-m1/Hello3D.cpp ${GLAD_C_FILE})
 target_include_directories(Hello3DM1 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
 target_link_libraries(Hello3DM1 glfw ${OPENGL_LIBS})
+
+# Tarefa M2 – Cubos instanciados
+add_executable(Hello3DM2 tarefa-m2/Hello3D.cpp ${GLAD_C_FILE})
+target_include_directories(Hello3DM2 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
+target_link_libraries(Hello3DM2 glfw ${OPENGL_LIBS})
