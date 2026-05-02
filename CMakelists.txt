@@ -87,3 +87,9 @@ target_link_libraries(Hello3DM1 glfw ${OPENGL_LIBS})
 add_executable(Hello3DM2 tarefa-m2/Hello3D.cpp ${GLAD_C_FILE})
 target_include_directories(Hello3DM2 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
 target_link_libraries(Hello3DM2 glfw ${OPENGL_LIBS})
+
+# Tarefa M3 – Texturas
+add_executable(Hello3DM3 tarefa-m3/Hello3D.cpp ${GLAD_C_FILE})
+target_include_directories(Hello3DM3 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
+target_compile_definitions(Hello3DM3 PRIVATE ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/Modelos3D/")
+target_link_libraries(Hello3DM3 glfw ${OPENGL_LIBS})
