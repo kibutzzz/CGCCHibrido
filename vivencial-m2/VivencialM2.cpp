@@ -18,8 +18,10 @@ const GLuint WIDTH  = 800, HEIGHT = 800;
 const int    SHADER_LOG_SIZE = 512;
 const float  ROTATE_SPEED    = 1.0f;
 const float  TRANSLATE_STEP  = 0.1f;
-const float  SCALE_STEP      = 0.1f;
+const float  SCALE_STEP      = 0.05f;
 const float  SCALE_MIN       = 0.1f;
+
+enum class Mode { ROTATE, TRANSLATE, SCALE };
 
 const GLchar* vertexShaderSource = R"(
     #version 410
@@ -46,14 +48,15 @@ struct ObjModel {
     GLuint    vao;
     int       nVertices;
     glm::vec3 position;
-    float     scale;
+    glm::vec3 scale;
     bool      rotateX, rotateY, rotateZ;
     float     angleX, angleY, angleZ;
     string    name;
 };
 
 vector<ObjModel> models;
-int selectedModel = 0;
+int  selectedModel = 0;
+Mode currentMode   = Mode::ROTATE;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 GLuint setupShader();
@@ -201,7 +204,7 @@ ObjModel loadModel(const string& name, const string& filePath, glm::vec3 positio
     ObjModel obj;
     obj.name     = name;
     obj.position = position;
-    obj.scale    = scale;
+    obj.scale    = glm::vec3(scale);
     obj.rotateX  = obj.rotateY = obj.rotateZ = false;
     obj.angleX   = obj.angleY = obj.angleZ = 0.0f;
     obj.vao      = loadSimpleOBJ(filePath, obj.nVertices, color);
@@ -215,7 +218,7 @@ glm::mat4 buildModelMatrix(const ObjModel& obj)
     model = glm::rotate(model, obj.angleX, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, obj.angleY, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, obj.angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, glm::vec3(obj.scale));
+    model = glm::scale(model, obj.scale);
     return model;
 }
 
@@ -241,17 +244,32 @@ void drawModels(GLint modelLoc)
     }
 }
 
+void printModeHelp(Mode m)
+{
+    switch (m) {
+        case Mode::ROTATE:
+            cout << "[Modo ROTACAO]  X/Y/Z: ativar/desativar rotacao no eixo\n";
+            break;
+        case Mode::TRANSLATE:
+            cout << "[Modo TRANSLACAO]  A/D: eixo X  |  W/S: eixo Z  |  I/J: eixo Y\n";
+            break;
+        case Mode::SCALE:
+            cout << "[Modo ESCALA]  X/Y/Z: escala por eixo  |  U: uniforme  |  Shift: diminuir\n";
+            break;
+    }
+}
+
 void printControls()
 {
     cout << "\n=== Controles ===\n"
-         << "Tab      : Alternar objeto selecionado\n"
-         << "X / Y / Z: Ativar/desativar rotacao no eixo correspondente\n"
-         << "A / D    : Transladar no eixo X\n"
-         << "W / S    : Transladar no eixo Z\n"
-         << "I / J    : Transladar no eixo Y\n"
-         << "] / [    : Aumentar / diminuir escala\n"
-         << "Esc      : Sair\n"
-         << "=================\n\n";
+         << "Tab : Alternar objeto selecionado\n"
+         << "R   : Modo rotacao\n"
+         << "T   : Modo translacao\n"
+         << "S   : Modo escala\n"
+         << "Esc : Sair\n"
+         << "=================\n";
+    printModeHelp(currentMode);
+    cout << "\n";
 }
 
 int main()
@@ -287,11 +305,13 @@ int main()
     glUseProgram(shaderID);
 
     const string modelsDir = ASSETS_DIR;
-    models.push_back(loadModel("Plane",        modelsDir + "1405 Plane.obj",            glm::vec3(-0.6f,  0.0f, 0.0f), 0.4f, glm::vec3(0.4f, 0.7f,  1.0f)));
-    models.push_back(loadModel("House",        modelsDir + "PUSHILIN_house.obj",        glm::vec3( 0.0f, -0.2f, 0.0f), 0.4f, glm::vec3(0.9f, 0.75f, 0.5f)));
-    models.push_back(loadModel("Lamborghini",  modelsDir + "Lamborghini_Aventador.obj", glm::vec3( 0.6f,  0.0f, 0.0f), 0.4f, glm::vec3(1.0f, 0.4f,  0.1f)));
+    models.push_back(loadModel("Plane",       modelsDir + "1405 Plane.obj",            glm::vec3(-0.6f,  0.0f, 0.0f), 0.4f, glm::vec3(0.4f, 0.7f,  1.0f)));
+    models.push_back(loadModel("House",       modelsDir + "PUSHILIN_house.obj",        glm::vec3( 0.0f, -0.2f, 0.0f), 0.4f, glm::vec3(0.9f, 0.75f, 0.5f)));
+    models.push_back(loadModel("Lamborghini", modelsDir + "Lamborghini_Aventador.obj", glm::vec3( 0.6f,  0.0f, 0.0f), 0.4f, glm::vec3(1.0f, 0.4f,  0.1f)));
 
-    cout << "Objeto selecionado: " << models[selectedModel].name << endl;
+    cout << "Objeto selecionado: " << models[selectedModel].name << "\n";
+    printModeHelp(currentMode);
+    cout << "\n";
 
     float lastTime = (float)glfwGetTime();
 
@@ -324,6 +344,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (action != GLFW_PRESS && action != GLFW_REPEAT)
         return;
 
+    bool shift = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
+                  glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
+
     ObjModel& obj = models[selectedModel];
 
     switch (key)
@@ -332,22 +355,60 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
         case GLFW_KEY_TAB:
             selectedModel = (selectedModel + 1) % (int)models.size();
-            cout << "Objeto selecionado: " << models[selectedModel].name << endl;
+            cout << "Objeto selecionado: " << models[selectedModel].name << "\n";
+            printModeHelp(currentMode);
             break;
 
-        case GLFW_KEY_X: obj.rotateX = !obj.rotateX; break;
-        case GLFW_KEY_Y: obj.rotateY = !obj.rotateY; break;
-        case GLFW_KEY_Z: obj.rotateZ = !obj.rotateZ; break;
+        case GLFW_KEY_R:
+            currentMode = Mode::ROTATE;
+            printModeHelp(currentMode);
+            break;
+        case GLFW_KEY_T:
+            currentMode = Mode::TRANSLATE;
+            printModeHelp(currentMode);
+            break;
+        case GLFW_KEY_S:
+            if (currentMode == Mode::TRANSLATE)
+                obj.position.z += TRANSLATE_STEP;
+            else {
+                currentMode = Mode::SCALE;
+                printModeHelp(currentMode);
+            }
+            break;
 
-        case GLFW_KEY_D: obj.position.x += TRANSLATE_STEP; break;
-        case GLFW_KEY_A: obj.position.x -= TRANSLATE_STEP; break;
-        case GLFW_KEY_I: obj.position.y += TRANSLATE_STEP; break;
-        case GLFW_KEY_J: obj.position.y -= TRANSLATE_STEP; break;
-        case GLFW_KEY_W: obj.position.z -= TRANSLATE_STEP; break;
-        case GLFW_KEY_S: obj.position.z += TRANSLATE_STEP; break;
+        case GLFW_KEY_X:
+            if (currentMode == Mode::ROTATE)
+                obj.rotateX = !obj.rotateX;
+            else if (currentMode == Mode::SCALE)
+                obj.scale.x = max(SCALE_MIN, obj.scale.x + (shift ? -SCALE_STEP : SCALE_STEP));
+            break;
+        case GLFW_KEY_Y:
+            if (currentMode == Mode::ROTATE)
+                obj.rotateY = !obj.rotateY;
+            else if (currentMode == Mode::SCALE)
+                obj.scale.y = max(SCALE_MIN, obj.scale.y + (shift ? -SCALE_STEP : SCALE_STEP));
+            break;
+        case GLFW_KEY_Z:
+            if (currentMode == Mode::ROTATE)
+                obj.rotateZ = !obj.rotateZ;
+            else if (currentMode == Mode::SCALE)
+                obj.scale.z = max(SCALE_MIN, obj.scale.z + (shift ? -SCALE_STEP : SCALE_STEP));
+            break;
 
-        case GLFW_KEY_RIGHT_BRACKET: obj.scale += SCALE_STEP;                              break;
-        case GLFW_KEY_LEFT_BRACKET:  obj.scale  = max(SCALE_MIN, obj.scale - SCALE_STEP); break;
+        case GLFW_KEY_U:
+            if (currentMode == Mode::SCALE) {
+                float delta = shift ? -SCALE_STEP : SCALE_STEP;
+                obj.scale.x = max(SCALE_MIN, obj.scale.x + delta);
+                obj.scale.y = max(SCALE_MIN, obj.scale.y + delta);
+                obj.scale.z = max(SCALE_MIN, obj.scale.z + delta);
+            }
+            break;
+
+        case GLFW_KEY_D: if (currentMode == Mode::TRANSLATE) obj.position.x += TRANSLATE_STEP; break;
+        case GLFW_KEY_A: if (currentMode == Mode::TRANSLATE) obj.position.x -= TRANSLATE_STEP; break;
+        case GLFW_KEY_I: if (currentMode == Mode::TRANSLATE) obj.position.y += TRANSLATE_STEP; break;
+        case GLFW_KEY_J: if (currentMode == Mode::TRANSLATE) obj.position.y -= TRANSLATE_STEP; break;
+        case GLFW_KEY_W: if (currentMode == Mode::TRANSLATE) obj.position.z -= TRANSLATE_STEP; break;
 
         default: break;
     }
