@@ -49,9 +49,9 @@ int main()
 
         float angle = (float)glfwGetTime();
         model = glm::mat4(1.0f);
-        if      (rotateX) model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-        else if (rotateY) model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        else if (rotateZ) model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+        if (rotateX) model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        if (rotateY) model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        if (rotateZ) model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
 
         shader.setMat4("model", model);
 
@@ -71,9 +71,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    if (key == GLFW_KEY_X && action == GLFW_PRESS) { rotateX = true;  rotateY = false; rotateZ = false; }
-    if (key == GLFW_KEY_Y && action == GLFW_PRESS) { rotateX = false; rotateY = true;  rotateZ = false; }
-    if (key == GLFW_KEY_Z && action == GLFW_PRESS) { rotateX = false; rotateY = false; rotateZ = true;  }
+    if (key == GLFW_KEY_X && action == GLFW_PRESS) rotateX = !rotateX;
+    if (key == GLFW_KEY_Y && action == GLFW_PRESS) rotateY = !rotateY;
+    if (key == GLFW_KEY_Z && action == GLFW_PRESS) rotateZ = !rotateZ;
 }
 
 GLuint setupGeometry()
