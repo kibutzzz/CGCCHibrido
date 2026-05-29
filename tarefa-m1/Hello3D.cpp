@@ -44,9 +44,6 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glLineWidth(10);
-        glPointSize(20);
-
         float angle = (float)glfwGetTime();
         model = glm::mat4(1.0f);
         if (rotateX) model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
