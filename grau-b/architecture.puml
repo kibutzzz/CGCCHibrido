@@ -1,0 +1,120 @@
+@startuml GrauB Architecture
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam packageStyle rectangle
+
+class Material {
+    +ka: vec3
+    +kd: vec3
+    +ks: vec3
+    +ns: float
+    +texName: string
+}
+
+class PointLight {
+    +position: vec3
+    +color: vec3
+    +intensity: float
+}
+
+class ObjectLoader {
+    +loadOBJ(path): VAO
+    +loadMTL(path): Material
+    +loadTexture(path): GLuint
+}
+
+class SceneObject {
+    +name: string
+    +vao: GLuint
+    +nVertices: int
+    +material: Material
+    +textureID: GLuint
+    +position: vec3
+    +rotation: vec3
+    +scale: float
+    +selected: bool
+    +animation: AnimationPath*
+    +modelMatrix(): mat4
+}
+
+class Scene {
+    +objects: vector<SceneObject>
+    +lights: vector<PointLight>
+    +camera: Camera
+    +selectedIndex: int
+    +selectNext()
+    +selectPrev()
+}
+
+class Camera {
+    +position: vec3
+    +front: vec3
+    +up: vec3
+    +fov: float
+    +near: float
+    +far: float
+    +viewMatrix(): mat4
+    +projectionMatrix(aspect): mat4
+    +processKeyboard(direction, dt)
+    +processMouse(dx, dy)
+}
+
+class AnimationPath {
+    +controlPoints: vector<vec3>
+    +t: float
+    +update(dt)
+    +currentPosition(): vec3
+}
+
+class SceneLoader {
+    +load(path): Scene
+}
+
+class InputHandler {
+    +onKey(key, scene)
+    +onMouseMove(dx, dy, camera)
+}
+
+class Window {
+    +window: GLFWwindow*
+    +width: int
+    +height: int
+    +Window(width, height, title)
+    +shouldClose(): bool
+    +swapBuffers()
+    +pollEvents()
+    +setKeyCallback(fn)
+}
+
+class ShaderProgram {
+    +id: GLuint
+    +ShaderProgram(vertPath, fragPath)
+    +use()
+    +setMat4(name, value)
+    +setVec3(name, value)
+    +setFloat(name, value)
+    +setInt(name, value)
+}
+
+class PhongShader {
+    +PhongShader()
+    +setLights(lights)
+    +setMaterial(material)
+    +setCameraPos(pos)
+}
+
+PhongShader --|> ShaderProgram
+
+Scene "1" *-- "many" SceneObject
+Scene "1" *-- "many" PointLight
+Scene "1" *-up- "1" Camera
+Scene "1" *-- "1" ShaderProgram
+SceneObject "1" o-- "0..1" AnimationPath
+SceneObject "1" *-- "1" Material
+SceneLoader ..> Scene : creates
+InputHandler ..> Scene : mutates
+InputHandler ..> Camera : mutates
+ObjectLoader ..> SceneObject : feeds
+
+@enduml
