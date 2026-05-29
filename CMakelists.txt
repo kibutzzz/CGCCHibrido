@@ -99,3 +99,9 @@ add_executable(VivencialM2 vivencial-m2/VivencialM2.cpp ${GLAD_C_FILE})
 target_include_directories(VivencialM2 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
 target_compile_definitions(VivencialM2 PRIVATE ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/Modelos3D/")
 target_link_libraries(VivencialM2 glfw ${OPENGL_LIBS})
+
+# Vivencial M4 – Iluminacao 3 pontos
+add_executable(VivencialM4 vivencial-m4/VivencialM4.cpp ${GLAD_C_FILE})
+target_include_directories(VivencialM4 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
+target_compile_definitions(VivencialM4 PRIVATE ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/Modelos3D/")
+target_link_libraries(VivencialM4 glfw ${OPENGL_LIBS})
