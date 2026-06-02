@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scene",
+  "type": "object",
+  "required": ["camera", "lights", "objects"],
+  "additionalProperties": false,
+  "properties": {
+    "camera": {
+      "type": "object",
+      "required": ["position", "front", "up", "fov", "near", "far"],
+      "additionalProperties": false,
+      "properties": {
+        "position": { "$ref": "#/definitions/vec3" },
+        "front":    { "$ref": "#/definitions/vec3" },
+        "up":       { "$ref": "#/definitions/vec3" },
+        "fov":      { "type": "number", "exclusiveMinimum": 0, "maximum": 180 },
+        "near":     { "type": "number", "exclusiveMinimum": 0 },
+        "far":      { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "lights": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["position", "color", "intensity"],
+        "additionalProperties": false,
+        "properties": {
+          "position":  { "$ref": "#/definitions/vec3" },
+          "color":     { "$ref": "#/definitions/vec3" },
+          "intensity": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["obj", "position", "rotation", "scale"],
+        "additionalProperties": false,
+        "properties": {
+          "obj":       { "type": "string" },
+          "position":  { "$ref": "#/definitions/vec3" },
+          "rotation":  { "$ref": "#/definitions/vec3" },
+          "scale":     { "type": "number", "exclusiveMinimum": 0 },
+          "animation": {
+            "type": "object",
+            "required": ["points"],
+            "additionalProperties": false,
+            "properties": {
+              "points": {
+                "type": "array",
+                "minItems": 2,
+                "items": { "$ref": "#/definitions/vec3" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "vec3": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    }
+  }
+}
