@@ -2,6 +2,10 @@
 
 **Autor:** Leonardo Meinerz Ramos
 
+## Screenshot
+
+![Tarefa M5 - Câmera em Primeira Pessoa](screenshot.png)
+
 ## Como executar
 
 ```bash
