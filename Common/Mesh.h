@@ -1,9 +1,9 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 
 #include <fstream>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -17,7 +17,7 @@ struct Material {
   std::string texName;
 };
 
-inline GLuint loadTexture(const std::string& filePath) {
+GLuint loadTexture(const std::string& filePath) {
   GLuint texID;
   glGenTextures(1, &texID);
   glBindTexture(GL_TEXTURE_2D, texID);
@@ -33,8 +33,8 @@ inline GLuint loadTexture(const std::string& filePath) {
       stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
   if (data) {
     GLenum fmt = (nrChannels == 3) ? GL_RGB : GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, fmt, width, height, 0, fmt,
-                 GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, fmt, width, height, 0, fmt, GL_UNSIGNED_BYTE,
+                 data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     std::cerr << "Mesh: failed to load texture: " << filePath << "\n";
@@ -44,7 +44,7 @@ inline GLuint loadTexture(const std::string& filePath) {
   return texID;
 }
 
-inline Material loadMTL(const std::string& filePath) {
+Material loadMTL(const std::string& filePath) {
   Material mat;
   std::ifstream file(filePath);
   if (!file.is_open()) {
@@ -83,8 +83,30 @@ inline Material loadMTL(const std::string& filePath) {
   return mat;
 }
 
-inline GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
-                             std::string& mtlFile) {
+struct FaceVertex {
+  int vi, ti, ni;
+};
+
+void pushVertex(std::vector<GLfloat>& vBuffer,
+                const std::vector<glm::vec3>& positions,
+                const std::vector<glm::vec3>& normals,
+                const std::vector<glm::vec2>& texCoords,
+                const glm::vec3& defaultColor, const FaceVertex& fv) {
+  vBuffer.push_back(positions[fv.vi].x);
+  vBuffer.push_back(positions[fv.vi].y);
+  vBuffer.push_back(positions[fv.vi].z);
+  vBuffer.push_back(defaultColor.r);
+  vBuffer.push_back(defaultColor.g);
+  vBuffer.push_back(defaultColor.b);
+  vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].x);
+  vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].y);
+  vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].z);
+  vBuffer.push_back(texCoords.empty() ? 0.0f : texCoords[fv.ti].s);
+  vBuffer.push_back(texCoords.empty() ? 0.0f : texCoords[fv.ti].t);
+}
+
+GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
+                     std::string& mtlFile) {
   std::vector<glm::vec3> positions;
   std::vector<glm::vec2> texCoords;
   std::vector<glm::vec3> normals;
@@ -118,36 +140,25 @@ inline GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
       ssline >> vn.x >> vn.y >> vn.z;
       normals.push_back(vn);
     } else if (token == "f") {
-      struct FaceVertex {
-        int vi, ti, ni;
-      };
       std::vector<FaceVertex> faceVerts;
       while (ssline >> token) {
         FaceVertex fv = {0, 0, 0};
         std::istringstream ss(token);
         std::string idx;
-        if (std::getline(ss, idx, '/')) fv.vi = !idx.empty() ? stoi(idx) - 1 : 0;
-        if (std::getline(ss, idx, '/')) fv.ti = !idx.empty() ? stoi(idx) - 1 : 0;
+        if (std::getline(ss, idx, '/'))
+          fv.vi = !idx.empty() ? stoi(idx) - 1 : 0;
+        if (std::getline(ss, idx, '/'))
+          fv.ti = !idx.empty() ? stoi(idx) - 1 : 0;
         if (std::getline(ss, idx)) fv.ni = !idx.empty() ? stoi(idx) - 1 : 0;
         faceVerts.push_back(fv);
       }
-      auto pushVertex = [&](const FaceVertex& fv) {
-        vBuffer.push_back(positions[fv.vi].x);
-        vBuffer.push_back(positions[fv.vi].y);
-        vBuffer.push_back(positions[fv.vi].z);
-        vBuffer.push_back(defaultColor.r);
-        vBuffer.push_back(defaultColor.g);
-        vBuffer.push_back(defaultColor.b);
-        vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].x);
-        vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].y);
-        vBuffer.push_back(normals.empty() ? 0.0f : normals[fv.ni].z);
-        vBuffer.push_back(texCoords.empty() ? 0.0f : texCoords[fv.ti].s);
-        vBuffer.push_back(texCoords.empty() ? 0.0f : texCoords[fv.ti].t);
-      };
       for (int i = 1; i + 1 < (int)faceVerts.size(); i++) {
-        pushVertex(faceVerts[0]);
-        pushVertex(faceVerts[i]);
-        pushVertex(faceVerts[i + 1]);
+        pushVertex(vBuffer, positions, normals, texCoords, defaultColor,
+                   faceVerts[0]);
+        pushVertex(vBuffer, positions, normals, texCoords, defaultColor,
+                   faceVerts[i]);
+        pushVertex(vBuffer, positions, normals, texCoords, defaultColor,
+                   faceVerts[i + 1]);
       }
     }
   }
