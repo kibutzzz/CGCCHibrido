@@ -2,10 +2,11 @@
 
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <memory>
 
+#include "AnimationPath.h"
 #include "Scene.h"
 
-// Camera is passed in from Common/Camera.h — forward-declared here
 class Camera;
 
 class InputHandler {
@@ -17,18 +18,20 @@ public:
 
         if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
             scene.selectNext();
-            auto& obj = scene.selected();
-            int wps = obj.animation ? (int)obj.animation->controlPoints.size() : 0;
-            std::cout << "Selected: " << obj.name << "  waypoints: " << wps << "\n";
+            SceneObject& selectedObject = scene.selected();
+            int waypointCount = selectedObject.animation
+                ? (int)selectedObject.animation->controlPoints.size() : 0;
+            std::cout << "Selected: " << selectedObject.name
+                      << "  waypoints: " << waypointCount << "\n";
         }
 
         if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-            auto& obj = scene.selected();
-            if (!obj.animation)
-                obj.animation = std::make_unique<AnimationPath>();
-            obj.animation->addPoint(camera.pos);
-            std::cout << "Waypoint added to " << obj.name
-                      << "  total: " << obj.animation->controlPoints.size() << "\n";
+            SceneObject& selectedObject = scene.selected();
+            if (!selectedObject.animation)
+                selectedObject.animation = std::make_unique<AnimationPath>();
+            selectedObject.animation->addWaypoint(camera.pos);
+            std::cout << "Waypoint added to " << selectedObject.name
+                      << "  total: " << selectedObject.animation->controlPoints.size() << "\n";
         }
     }
 

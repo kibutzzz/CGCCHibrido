@@ -14,10 +14,10 @@
 #include "SceneLoader.h"
 #include "InputHandler.h"
 
-static const int WIDTH  = 1200;
-static const int HEIGHT = 800;
+static const int WINDOW_WIDTH  = 1200;
+static const int WINDOW_HEIGHT = 800;
 
-// Globals for GLFW callbacks (needed because GLFW requires plain function pointers)
+// Globals needed for GLFW plain-function callbacks
 static Camera* g_camera = nullptr;
 static Scene*  g_scene  = nullptr;
 
@@ -28,12 +28,12 @@ void mouseCallback(GLFWwindow*, double xpos, double ypos) { g_camera->processMou
 void scrollCallback(GLFWwindow*, double, double yoffset)  { g_camera->processScroll(yoffset); }
 
 int main() {
-    Window win(WIDTH, HEIGHT, "Tarefa M6 - Trajeto\xc3\xb3rias");
+    Window window(WINDOW_WIDTH, WINDOW_HEIGHT, "Tarefa M6 - Trajet\xc3\xb3rias");
 
-    glfwSetKeyCallback(win.window, keyCallback);
-    glfwSetCursorPosCallback(win.window, mouseCallback);
-    glfwSetScrollCallback(win.window, scrollCallback);
-    glfwSetInputMode(win.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetKeyCallback(window.window, keyCallback);
+    glfwSetCursorPosCallback(window.window, mouseCallback);
+    glfwSetScrollCallback(window.window, scrollCallback);
+    glfwSetInputMode(window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
     std::cout << "OpenGL:   " << glGetString(GL_VERSION)  << "\n";
@@ -54,48 +54,46 @@ int main() {
 
     // --- Build scene ---
     Scene scene;
-
-    // Light
     scene.lights.push_back({{5.0f, 8.0f, 5.0f}, {1.0f, 1.0f, 1.0f}, 1.0f});
 
-    const std::string assets = ASSETS_DIR;
+    const std::string assetsDir = ASSETS_DIR;
 
-    // Object 0: Suzanne — circular orbit on the left
+    // Suzanne — circular orbit on the left
     {
-        SceneObject obj = makeObject(assets, "Suzanne.obj");
-        obj.scale = 1.0f;
-        obj.animation = std::make_unique<AnimationPath>();
-        obj.animation->controlPoints = {
-            {-4.0f, 0.0f,  2.0f},
-            {-4.0f, 2.0f,  0.0f},
-            {-4.0f, 0.0f, -2.0f},
-            {-4.0f,-2.0f,  0.0f},
+        SceneObject suzanne = makeObject(assetsDir, "Suzanne.obj");
+        suzanne.scale = 1.0f;
+        suzanne.animation = std::make_unique<AnimationPath>();
+        suzanne.animation->controlPoints = {
+            {-4.0f,  0.0f,  2.0f},
+            {-4.0f,  2.0f,  0.0f},
+            {-4.0f,  0.0f, -2.0f},
+            {-4.0f, -2.0f,  0.0f},
         };
-        obj.position = obj.animation->currentPosition();
-        scene.objects.push_back(std::move(obj));
+        suzanne.position = suzanne.animation->currentPosition();
+        scene.objects.push_back(std::move(suzanne));
     }
 
-    // Object 1: House — square path on the right
+    // House — square path on the right
     {
-        SceneObject obj = makeObject(assets, "PUSHILIN_house.obj");
-        obj.scale = 1.0f;
-        obj.animation = std::make_unique<AnimationPath>();
-        obj.animation->controlPoints = {
+        SceneObject house = makeObject(assetsDir, "PUSHILIN_house.obj");
+        house.scale = 1.0f;
+        house.animation = std::make_unique<AnimationPath>();
+        house.animation->controlPoints = {
             { 4.0f, 0.0f,  3.0f},
             { 7.0f, 0.0f,  0.0f},
             { 4.0f, 0.0f, -3.0f},
             { 1.0f, 0.0f,  0.0f},
         };
-        obj.position = obj.animation->currentPosition();
-        scene.objects.push_back(std::move(obj));
+        house.position = house.animation->currentPosition();
+        scene.objects.push_back(std::move(house));
     }
 
-    // Object 2: Ground plane — static, no animation
+    // Ground plane — static, no animation
     {
-        SceneObject obj = makeObject(assets, "1405 Plane.obj");
-        obj.position = {0.0f, -2.5f, 0.0f};
-        obj.scale = 0.05f;
-        scene.objects.push_back(std::move(obj));
+        SceneObject groundPlane = makeObject(assetsDir, "1405 Plane.obj");
+        groundPlane.position = {0.0f, -2.5f, 0.0f};
+        groundPlane.scale = 0.05f;
+        scene.objects.push_back(std::move(groundPlane));
     }
 
     scene.objects[0].selected = true;
@@ -104,31 +102,31 @@ int main() {
     g_scene  = &scene;
     g_camera = &camera;
 
-    std::cout << "Cena carregada: " << scene.objects.size() << " objeto(s)\n";
-    for (auto& o : scene.objects) {
-        int wps = o.animation ? (int)o.animation->controlPoints.size() : 0;
-        std::cout << "  " << o.name << " — waypoints: " << wps << "\n";
+    std::cout << "Scene loaded: " << scene.objects.size() << " object(s)\n";
+    for (auto& obj : scene.objects) {
+        int waypointCount = obj.animation ? (int)obj.animation->controlPoints.size() : 0;
+        std::cout << "  " << obj.name << " — waypoints: " << waypointCount << "\n";
     }
-    std::cout << "Selecionado: " << scene.selected().name << "\n\n";
+    std::cout << "Selected: " << scene.selected().name << "\n\n";
 
-    float lastTime = (float)glfwGetTime();
+    float previousTime = (float)glfwGetTime();
 
-    while (!win.shouldClose()) {
-        float now = (float)glfwGetTime();
-        float dt  = now - lastTime;
-        lastTime  = now;
+    while (!window.shouldClose()) {
+        float currentTime = (float)glfwGetTime();
+        float deltaTime   = currentTime - previousTime;
+        previousTime      = currentTime;
 
-        win.pollEvents();
-        camera.processKeyboard(win.window, dt);
+        window.pollEvents();
+        camera.processKeyboard(window.window, deltaTime);
 
         for (auto& obj : scene.objects)
             if (obj.animation) {
-                obj.animation->update(dt);
+                obj.animation->update(deltaTime);
                 obj.position = obj.animation->currentPosition();
             }
 
         shader.setMat4("view",       camera.viewMatrix());
-        shader.setMat4("projection", camera.projectionMatrix((float)WIDTH / HEIGHT));
+        shader.setMat4("projection", camera.projectionMatrix((float)WINDOW_WIDTH / WINDOW_HEIGHT));
         shader.setVec3("camPos",     camera.pos);
 
         if (!scene.lights.empty()) {
@@ -153,7 +151,7 @@ int main() {
             glBindVertexArray(0);
         }
 
-        win.swapBuffers();
+        window.swapBuffers();
     }
 
     return 0;
