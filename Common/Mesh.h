@@ -71,7 +71,7 @@ Material loadMTL(const std::string& filePath) {
     } else if (token == "Ns") {
       ss >> mat.ns;
     } else if (token == "map_Kd") {
-      ss >> mat.texName;
+      std::getline(ss >> std::ws, mat.texName);
     }
   }
 
@@ -126,7 +126,7 @@ GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
     ssline >> token;
 
     if (token == "mtllib") {
-      ssline >> mtlFile;
+      std::getline(ssline >> std::ws, mtlFile);
     } else if (token == "v") {
       glm::vec3 v;
       ssline >> v.x >> v.y >> v.z;
