@@ -58,7 +58,7 @@ int main() {
 
   ShaderProgram shader(SHADERS_DIR "vertex.vert", SHADERS_DIR "fragment.frag");
   shader.use();
-  shader.setInt("tex_buffer", 0);
+  shader.setInt("textureBuffer", 0);
 
   // --- Build scene ---
   Scene scene;
@@ -138,10 +138,10 @@ int main() {
     shader.setMat4("view", camera.viewMatrix());
     shader.setMat4("projection", camera.projectionMatrix((float)WINDOW_WIDTH /
                                                          WINDOW_HEIGHT));
-    shader.setVec3("camPos", camera.pos);
+    shader.setVec3("cameraPosition", camera.pos);
 
     if (!scene.lights.empty()) {
-      shader.setVec3("lightPos", scene.lights[0].position);
+      shader.setVec3("lightPosition", scene.lights[0].position);
       shader.setVec3("lightColor",
                      scene.lights[0].color * scene.lights[0].intensity);
     }
