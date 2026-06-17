@@ -2,7 +2,7 @@
 
 ## Demonstração
 
-https://github.com/kibutzzz/CGCCHibrido/raw/tarefa-m6/tarefa-m6/demo.mp4
+![demo](demo.mp4)
 
 ## Descrição
 
