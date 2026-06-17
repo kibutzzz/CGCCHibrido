@@ -14,29 +14,11 @@ class InputHandler {
  public:
   static void onKey(GLFWwindow* window, int key, int scancode, int action,
                     int mods, Scene& scene, Camera& camera) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GL_TRUE);
+    if (action != GLFW_PRESS) return;
 
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
-      scene.selectNext();
-      SceneObject& selectedObject = scene.selected();
-      int waypointCount =
-          selectedObject.animation
-              ? (int)selectedObject.animation->controlPoints.size()
-              : 0;
-      std::cout << "Selected: " << selectedObject.name
-                << "  waypoints: " << waypointCount << "\n";
-    }
-
-    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-      SceneObject& selectedObject = scene.selected();
-      if (!selectedObject.animation)
-        selectedObject.animation = std::make_unique<AnimationPath>();
-      selectedObject.animation->addWaypoint(camera.pos);
-      std::cout << "Waypoint added to " << selectedObject.name
-                << "  total: " << selectedObject.animation->controlPoints.size()
-                << "\n";
-    }
+    if (key == GLFW_KEY_ESCAPE) onEscape(window);
+    if (key == GLFW_KEY_TAB) onSelectNext(scene);
+    if (key == GLFW_KEY_P) onAddWaypoint(scene, camera);
   }
 
   static void onMouseMove(double xpos, double ypos, Camera& camera) {
@@ -45,5 +27,25 @@ class InputHandler {
 
   static void onScroll(double yoffset, Camera& camera) {
     camera.processScroll(yoffset);
+  }
+
+ private:
+  static void onEscape(GLFWwindow* window) {
+    glfwSetWindowShouldClose(window, GL_TRUE);
+  }
+
+  static void onSelectNext(Scene& scene) {
+    scene.selectNext();
+    SceneObject& obj = scene.selected();
+    int count = obj.animation ? obj.animation->waypointCount() : 0;
+    std::cout << "Selected: " << obj.name << "  waypoints: " << count << "\n";
+  }
+
+  static void onAddWaypoint(Scene& scene, Camera& camera) {
+    SceneObject& obj = scene.selected();
+    if (!obj.animation) obj.animation = std::make_unique<AnimationPath>();
+    obj.animation->addWaypoint(camera.pos);
+    std::cout << "Waypoint added to " << obj.name
+              << "  total: " << obj.animation->waypointCount() << "\n";
   }
 };

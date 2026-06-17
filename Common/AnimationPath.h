@@ -11,9 +11,8 @@ struct AnimationPath {
 
   void update(float deltaTime) {
     if (controlPoints.size() < 2) return;
-    glm::vec3 currentWaypoint = controlPoints[waypointIndex];
-    glm::vec3 nextWaypoint = controlPoints[nextIndex()];
-    float segmentLength = glm::distance(currentWaypoint, nextWaypoint);
+    float segmentLength =
+        glm::distance(controlPoints[waypointIndex], controlPoints[nextIndex()]);
     if (segmentLength < 1e-4f) {
       advanceWaypoint();
       return;
@@ -33,6 +32,7 @@ struct AnimationPath {
   }
 
   void addWaypoint(glm::vec3 point) { controlPoints.push_back(point); }
+  int waypointCount() const { return (int)controlPoints.size(); }
 
  private:
   int nextIndex() const {

@@ -18,18 +18,21 @@ struct Scene {
 
   void selectNext() {
     if (objects.empty()) return;
-    objects[selectedIndex].selected = false;
-    selectedIndex = (selectedIndex + 1) % (int)objects.size();
-    objects[selectedIndex].selected = true;
+    setSelected((selectedIndex + 1) % (int)objects.size());
   }
 
   void selectPrev() {
     if (objects.empty()) return;
-    objects[selectedIndex].selected = false;
-    selectedIndex =
-        ((selectedIndex - 1) + (int)objects.size()) % (int)objects.size();
-    objects[selectedIndex].selected = true;
+    setSelected(((selectedIndex - 1) + (int)objects.size()) %
+                (int)objects.size());
   }
 
   SceneObject& selected() { return objects[selectedIndex]; }
+
+ private:
+  void setSelected(int index) {
+    objects[selectedIndex].selected = false;
+    selectedIndex = index;
+    objects[selectedIndex].selected = true;
+  }
 };
