@@ -7,14 +7,7 @@
 #include <string>
 
 #include "AnimationPath.h"
-
-struct Material {
-    glm::vec3 ka = glm::vec3(0.1f);
-    glm::vec3 kd = glm::vec3(0.8f);
-    glm::vec3 ks = glm::vec3(0.5f);
-    float ns = 32.0f;
-    std::string texName;
-};
+#include "Mesh.h"
 
 struct SceneObject {
     std::string name;
