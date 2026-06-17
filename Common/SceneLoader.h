@@ -9,14 +9,16 @@
 
 static SceneObject makeObject(const std::string& assetsDir,
                               const std::string& objFilename) {
-  SceneObject obj;
-  obj.name = objFilename;
+  SceneObject sceneObject;
+  sceneObject.name = objFilename;
   std::string mtlFilename;
-  obj.vao = loadSimpleOBJ(assetsDir + objFilename, obj.nVertices, mtlFilename);
+  sceneObject.vertexArrayObject = loadSimpleOBJ(
+      assetsDir + objFilename, sceneObject.vertexCount, mtlFilename);
   if (!mtlFilename.empty()) {
-    obj.material = loadMTL(assetsDir + mtlFilename);
-    if (!obj.material.texName.empty())
-      obj.textureID = loadTexture(assetsDir + obj.material.texName);
+    sceneObject.material = loadMTL(assetsDir + mtlFilename);
+    if (!sceneObject.material.texName.empty())
+      sceneObject.textureID =
+          loadTexture(assetsDir + sceneObject.material.texName);
   }
-  return obj;
+  return sceneObject;
 }

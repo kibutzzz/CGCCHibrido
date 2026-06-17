@@ -36,16 +36,19 @@ class InputHandler {
 
   static void onSelectNext(Scene& scene) {
     scene.selectNext();
-    SceneObject& obj = scene.selected();
-    int count = obj.animation ? obj.animation->waypointCount() : 0;
-    std::cout << "Selected: " << obj.name << "  waypoints: " << count << "\n";
+    SceneObject& sceneObject = scene.selected();
+    int waypointCount =
+        sceneObject.animation ? sceneObject.animation->waypointCount() : 0;
+    std::cout << "Selected: " << sceneObject.name
+              << "  waypoints: " << waypointCount << "\n";
   }
 
   static void onAddWaypoint(Scene& scene, Camera& camera) {
-    SceneObject& obj = scene.selected();
-    if (!obj.animation) obj.animation = std::make_unique<AnimationPath>();
-    obj.animation->addWaypoint(camera.pos);
-    std::cout << "Waypoint added to " << obj.name
-              << "  total: " << obj.animation->waypointCount() << "\n";
+    SceneObject& sceneObject = scene.selected();
+    if (!sceneObject.animation)
+      sceneObject.animation = std::make_unique<AnimationPath>();
+    sceneObject.animation->addWaypoint(camera.pos);
+    std::cout << "Waypoint added to " << sceneObject.name
+              << "  total: " << sceneObject.animation->waypointCount() << "\n";
   }
 };

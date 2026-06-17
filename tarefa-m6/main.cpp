@@ -111,10 +111,11 @@ int main() {
   g_camera = &camera;
 
   std::cout << "Scene loaded: " << scene.objects.size() << " object(s)\n";
-  for (auto& obj : scene.objects) {
+  for (auto& sceneObject : scene.objects) {
     int waypointCount =
-        obj.animation ? (int)obj.animation->controlPoints.size() : 0;
-    std::cout << "  " << obj.name << " — waypoints: " << waypointCount << "\n";
+        sceneObject.animation ? sceneObject.animation->waypointCount() : 0;
+    std::cout << "  " << sceneObject.name << " — waypoints: " << waypointCount
+              << "\n";
   }
   std::cout << "Selected: " << scene.selected().name << "\n\n";
 
@@ -128,10 +129,10 @@ int main() {
     window.pollEvents();
     camera.processKeyboard(window.window, deltaTime);
 
-    for (auto& obj : scene.objects)
-      if (obj.animation) {
-        obj.animation->update(deltaTime);
-        obj.position = obj.animation->currentPosition();
+    for (auto& sceneObject : scene.objects)
+      if (sceneObject.animation) {
+        sceneObject.animation->update(deltaTime);
+        sceneObject.position = sceneObject.animation->currentPosition();
       }
 
     shader.setMat4("view", camera.viewMatrix());
@@ -148,17 +149,17 @@ int main() {
     glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (auto& obj : scene.objects) {
-      shader.setMat4("model", obj.modelMatrix());
-      shader.setVec3("ka", obj.material.ka);
-      shader.setVec3("kd", obj.material.kd);
-      shader.setVec3("ks", obj.material.ks);
-      shader.setFloat("ns", obj.material.ns);
+    for (auto& sceneObject : scene.objects) {
+      shader.setMat4("model", sceneObject.modelMatrix());
+      shader.setVec3("ka", sceneObject.material.ka);
+      shader.setVec3("kd", sceneObject.material.kd);
+      shader.setVec3("ks", sceneObject.material.ks);
+      shader.setFloat("ns", sceneObject.material.ns);
 
       glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, obj.textureID);
-      glBindVertexArray(obj.vao);
-      glDrawArrays(GL_TRIANGLES, 0, obj.nVertices);
+      glBindTexture(GL_TEXTURE_2D, sceneObject.textureID);
+      glBindVertexArray(sceneObject.vertexArrayObject);
+      glDrawArrays(GL_TRIANGLES, 0, sceneObject.vertexCount);
       glBindVertexArray(0);
     }
 

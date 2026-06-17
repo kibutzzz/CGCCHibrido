@@ -12,8 +12,8 @@
 
 struct SceneObject {
   std::string name;
-  GLuint vao = 0;
-  int nVertices = 0;
+  GLuint vertexArrayObject = 0;
+  int vertexCount = 0;
   Material material;
   GLuint textureID = 0;
   glm::vec3 position = glm::vec3(0.0f);
