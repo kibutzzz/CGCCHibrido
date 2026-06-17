@@ -4,7 +4,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <memory>
 #include <string>
 
 #include "AnimationPath.h"
@@ -20,7 +19,8 @@ struct SceneObject {
   glm::vec3 rotation = glm::vec3(0.0f);
   float scale = 1.0f;
   bool selected = false;
-  std::unique_ptr<AnimationPath> animation;
+  bool hasAnimation = false;
+  AnimationPath animation;
 
   glm::mat4 modelMatrix() const {
     glm::mat4 m(1.0f);

@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <memory>
 
 #include "AnimationPath.h"
 #include "Scene.h"
@@ -38,17 +37,16 @@ class InputHandler {
     scene.selectNext();
     SceneObject& sceneObject = scene.selected();
     int waypointCount =
-        sceneObject.animation ? sceneObject.animation->waypointCount() : 0;
+        sceneObject.hasAnimation ? sceneObject.animation.waypointCount() : 0;
     std::cout << "Selected: " << sceneObject.name
               << "  waypoints: " << waypointCount << "\n";
   }
 
   static void onAddWaypoint(Scene& scene, Camera& camera) {
     SceneObject& sceneObject = scene.selected();
-    if (!sceneObject.animation)
-      sceneObject.animation = std::make_unique<AnimationPath>();
-    sceneObject.animation->addWaypoint(camera.pos);
+    sceneObject.hasAnimation = true;
+    sceneObject.animation.addWaypoint(camera.pos);
     std::cout << "Waypoint added to " << sceneObject.name
-              << "  total: " << sceneObject.animation->waypointCount() << "\n";
+              << "  total: " << sceneObject.animation.waypointCount() << "\n";
   }
 };

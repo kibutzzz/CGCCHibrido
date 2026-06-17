@@ -70,30 +70,30 @@ int main() {
   {
     SceneObject suzanne = makeObject(assetsDir, "Suzanne.obj");
     suzanne.scale = 1.0f;
-    suzanne.animation = std::make_unique<AnimationPath>();
-    suzanne.animation->controlPoints = {
+    suzanne.hasAnimation = true;
+    suzanne.animation.controlPoints = {
         {-4.0f, 0.0f, 2.0f},
         {-4.0f, 2.0f, 0.0f},
         {-4.0f, 0.0f, -2.0f},
         {-4.0f, -2.0f, 0.0f},
     };
-    suzanne.position = suzanne.animation->currentPosition();
-    scene.objects.push_back(std::move(suzanne));
+    suzanne.position = suzanne.animation.currentPosition();
+    scene.objects.push_back(suzanne);
   }
 
   // House — square path on the right
   {
     SceneObject house = makeObject(assetsDir, "PUSHILIN_house.obj");
     house.scale = 1.0f;
-    house.animation = std::make_unique<AnimationPath>();
-    house.animation->controlPoints = {
+    house.hasAnimation = true;
+    house.animation.controlPoints = {
         {4.0f, 0.0f, 3.0f},
         {7.0f, 0.0f, 0.0f},
         {4.0f, 0.0f, -3.0f},
         {1.0f, 0.0f, 0.0f},
     };
-    house.position = house.animation->currentPosition();
-    scene.objects.push_back(std::move(house));
+    house.position = house.animation.currentPosition();
+    scene.objects.push_back(house);
   }
 
   // Ground plane — static, no animation
@@ -101,7 +101,7 @@ int main() {
     SceneObject groundPlane = makeObject(assetsDir, "1405 Plane.obj");
     groundPlane.position = {0.0f, -2.5f, 0.0f};
     groundPlane.scale = 0.05f;
-    scene.objects.push_back(std::move(groundPlane));
+    scene.objects.push_back(groundPlane);
   }
 
   scene.objects[0].selected = true;
@@ -113,7 +113,7 @@ int main() {
   std::cout << "Scene loaded: " << scene.objects.size() << " object(s)\n";
   for (auto& sceneObject : scene.objects) {
     int waypointCount =
-        sceneObject.animation ? sceneObject.animation->waypointCount() : 0;
+        sceneObject.hasAnimation ? sceneObject.animation.waypointCount() : 0;
     std::cout << "  " << sceneObject.name << " — waypoints: " << waypointCount
               << "\n";
   }
@@ -130,9 +130,9 @@ int main() {
     camera.processKeyboard(window.window, deltaTime);
 
     for (auto& sceneObject : scene.objects)
-      if (sceneObject.animation) {
-        sceneObject.animation->update(deltaTime);
-        sceneObject.position = sceneObject.animation->currentPosition();
+      if (sceneObject.hasAnimation) {
+        sceneObject.animation.update(deltaTime);
+        sceneObject.position = sceneObject.animation.currentPosition();
       }
 
     shader.setMat4("view", camera.viewMatrix());
