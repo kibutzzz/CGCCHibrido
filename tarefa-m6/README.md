@@ -2,7 +2,7 @@
 
 ## Demonstração
 
-![demo](demo.mp4)
+[demo.mp4](demo.mp4)
 
 ## Descrição
 
