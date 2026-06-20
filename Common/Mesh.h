@@ -112,6 +112,7 @@ GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
   std::vector<glm::vec3> normals;
   std::vector<GLfloat> vBuffer;
   glm::vec3 defaultColor(1.0f, 0.0f, 0.0f);
+  bool hasOBJNormals = false;
 
   std::ifstream file(filePath);
   if (!file.is_open()) {
@@ -139,8 +140,8 @@ GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
       glm::vec3 vn;
       ssline >> vn.x >> vn.y >> vn.z;
       normals.push_back(vn);
-    } else if (token == "f") {
-      std::vector<FaceVertex> faceVerts;
+      hasOBJNormals = true;
+    } else if (token == "f") {      std::vector<FaceVertex> faceVerts;
       while (ssline >> token) {
         FaceVertex fv = {0, 0, 0};
         std::istringstream ss(token);
@@ -153,6 +154,15 @@ GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
         faceVerts.push_back(fv);
       }
       for (int i = 1; i + 1 < (int)faceVerts.size(); i++) {
+        if (!hasOBJNormals) {
+          glm::vec3 v0 = positions[faceVerts[0].vi];
+          glm::vec3 v1 = positions[faceVerts[i].vi];
+          glm::vec3 v2 = positions[faceVerts[i + 1].vi];
+          glm::vec3 faceNormal = glm::normalize(glm::cross(v1 - v0, v2 - v0));
+          normals.push_back(faceNormal);
+          int ni = (int)normals.size() - 1;
+          faceVerts[0].ni = faceVerts[i].ni = faceVerts[i + 1].ni = ni;
+        }
         pushVertex(vBuffer, positions, normals, texCoords, defaultColor,
                    faceVerts[0]);
         pushVertex(vBuffer, positions, normals, texCoords, defaultColor,

@@ -1,0 +1,60 @@
+{
+  "camera": {
+    "position": [0.0, 4.0, 10.0],
+    "front": [0.0, -0.423, -0.906],
+    "up": [0.0, 1.0, 0.0],
+    "fov": 45.0,
+    "near": 0.1,
+    "far": 100.0
+  },
+  "lights": [
+    {
+      "position": [5.0, 8.0, 5.0],
+      "color": [1.0, 1.0, 1.0],
+      "intensity": 1.0
+    }
+  ],
+  "objects": [
+    { "obj": "cobblestones.obj", "position": [-2.589, 0.0,  -2.522], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-0.679, 0.0,  -2.522], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 1.231, 0.0,  -2.522], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 3.141, 0.0,  -2.522], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-2.589, 0.0,  -0.612], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-0.679, 0.0,  -0.612], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 1.231, 0.0,  -0.612], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 3.141, 0.0,  -0.612], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-2.589, 0.0,   1.298], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-0.679, 0.0,   1.298], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 1.231, 0.0,   1.298], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 3.141, 0.0,   1.298], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-2.589, 0.0,   3.208], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [-0.679, 0.0,   3.208], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 1.231, 0.0,   3.208], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "cobblestones.obj", "position": [ 3.141, 0.0,   3.208], "rotation": [0, 0, 0], "scale": 0.25 },
+    { "obj": "PUSHILIN_house.obj",           "position": [0.0,  1.47, 0.0],  "rotation": [0, 0,   0], "scale": 2.0  },
+    { "obj": "Lamborghini_Aventador.obj",    "position": [-2.5, 0.177, 2.5], "rotation": [0, 45,  0], "scale": 0.005 },
+    { "obj": "1405 Plane.obj", "position": [1.5, 5.0, 0.0], "rotation": [0, -30, 15], "scale": 0.05 },
+    {
+      "obj": "basketball.obj",
+      "position": [2.5, 0.47, -1.5],
+      "rotation": [0, 0, 0],
+      "scale": 0.0075,
+      "animation": {
+        "points": [
+          [2.5, 0.47, -1.5],
+          [2.5, 0.75, -1.5],
+          [2.5, 2.0,  -1.5],
+          [2.5, 0.75, -1.5],
+          [2.5, 0.47, -1.5],
+          [2.5, 0.6,  -1.5],
+          [2.5, 1.2,  -1.5],
+          [2.5, 0.6,  -1.5],
+          [2.5, 0.47, -1.5],
+          [2.5, 0.52, -1.5],
+          [2.5, 0.7,  -1.5],
+          [2.5, 0.52, -1.5]
+        ]
+      }
+    }
+  ]
+}
