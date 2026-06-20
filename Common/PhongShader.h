@@ -16,12 +16,18 @@ class PhongShader : public ShaderProgram {
     setFloat("ns", m.ns);
   }
 
-  void setLight(const PointLight& light) const {
-    setVec3("lightPosition", light.position);
-    setVec3("lightColor", light.color * light.intensity);
+  void setLights(const std::vector<PointLight>& lights) const {
+    for (int i = 0; i < (int)lights.size(); i++) {
+      setVec3("lightPositions[" + std::to_string(i) + "]", lights[i].position);
+      setVec3("lightColors[" + std::to_string(i) + "]", lights[i].color * lights[i].intensity);
+    }
   }
 
   void setCameraPos(const glm::vec3& pos) const {
     setVec3("cameraPosition", pos);
+  }
+
+  void setSelectionBrightness(float b) const {
+    setFloat("selectionBrightness", b);
   }
 };
