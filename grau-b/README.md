@@ -19,20 +19,51 @@ cmake --build build --target GrauB
 
 ## Controles
 
+### Troca de modo
+
+| Tecla | Modo |
+|---|---|
+| `Esc` | Navegar |
+| `1` | Transformar |
+| `2` | Animação |
+| `3` | Luz |
+| `Q` | Sair |
+
+### Modo navegar (`Esc`)
+
 | Tecla | Ação |
 |---|---|
-| `Esc` | Modo navegar (câmera livre) |
-| `1` | Modo transformar objeto selecionado |
-| `2` | Modo animação |
-| `3` | Modo luz |
-| `Tab` | Selecionar próximo objeto / luz |
-| `WASD` | Mover câmera (navegar) ou objeto/luz (outros modos) |
-| `I / J` | Mover objeto/luz no eixo Y |
+| `WASD` | Mover câmera |
+| Mouse | Olhar |
+| Scroll | Zoom (FOV) |
+
+### Modo transformar (`1`)
+
+| Tecla | Ação |
+|---|---|
+| `Tab` | Selecionar próximo objeto |
+| `WASD` | Mover no plano XZ |
+| `I / J` | Mover no eixo Y |
 | `U / O` | Rotacionar yaw |
 | `K / ;` | Rotacionar pitch |
 | `N / M` | Rotacionar roll |
-| `+ / -` | Escala (transformar) ou intensidade (luz) |
-| `Space` | Adicionar waypoint à frente (animação) |
+| `+ / -` | Escala uniforme |
+
+### Modo animação (`2`)
+
+| Tecla | Ação |
+|---|---|
+| `Tab` | Selecionar próximo objeto |
+| `Space` | Adicionar waypoint 10u à frente da câmera |
+
+### Modo luz (`3`)
+
+| Tecla | Ação |
+|---|---|
+| `Tab` | Selecionar próxima luz |
+| `WASD` | Mover no plano XZ |
+| `I / J` | Mover no eixo Y |
+| `+ / -` | Ajustar intensidade |
 
 ## Cena
 
