@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include <algorithm>
 #include <iostream>
 
 #include "AnimationPath.h"
@@ -9,15 +10,51 @@
 
 class Camera;
 
+enum class AppMode { Navigate = 0, Transform = 1, Animation = 2, Light = 3 };
+
 class InputHandler {
  public:
+  static AppMode mode;
+  static int selectedLight;
+
   static void onKey(GLFWwindow* window, int key, int scancode, int action,
                     int mods, Scene& scene, Camera& camera) {
-    if (action != GLFW_PRESS) return;
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
+      return;
+    }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      setMode(AppMode::Navigate, window);
+      return;
+    }
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+      setMode(AppMode::Transform, window);
+      return;
+    }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+      setMode(AppMode::Animation, window);
+      return;
+    }
 
-    if (key == GLFW_KEY_ESCAPE) onEscape(window);
-    if (key == GLFW_KEY_TAB) onSelectNext(scene);
-    if (key == GLFW_KEY_P) onAddWaypoint(scene, camera);
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+      setMode(AppMode::Light, window);
+      return;
+    }
+
+    if (mode == AppMode::Transform) onTransformKey(key, action, scene);
+    if (mode == AppMode::Animation) onAnimationKey(key, action, scene, camera);
+    if (mode == AppMode::Light) onLightKey(key, action, scene);
+  }
+
+  static void processHeldKeys(GLFWwindow* window, float dt, Scene& scene,
+                               Camera& camera) {
+    if (mode == AppMode::Navigate) {
+      camera.processKeyboard(window, dt);
+    } else if (mode == AppMode::Transform && !scene.objects.empty()) {
+      processTransformHeld(window, dt, scene.selected());
+    } else if (mode == AppMode::Light && !scene.lights.empty()) {
+      processLightHeld(window, dt, scene.lights[selectedLight]);
+    }
   }
 
   static void onMouseMove(double xpos, double ypos, Camera& camera) {
@@ -28,25 +65,117 @@ class InputHandler {
     camera.processScroll(yoffset);
   }
 
+  static bool showCrosshair() {
+    return mode == AppMode::Animation || mode == AppMode::Light;
+  }
+
+  static void printControls() {
+    std::cout << "\n=== Controles ===\n"
+              << "Esc      : modo navegar (camara livre)\n"
+              << "           mouse=olhar  WASD=mover  scroll=zoom\n"
+              << "1        : modo transformar (Tab=selecionar)\n"
+              << "           WASD=mover XZ  I/J=mover Y  +/-=escala\n"
+              << "           U/O=yaw  K/;=pitch  N/M=roll\n"
+              << "2        : modo animacao (Tab=selecionar  Space=waypoint 10u a frente)\n"
+              << "3        : modo luz (Tab=selecionar  +/-=intensidade  WASDIJ=posicao)\n"
+              << "=================\n\n";
+  }
+
  private:
-  static void onEscape(GLFWwindow* window) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
+  static void setMode(AppMode m, GLFWwindow* window) {
+    mode = m;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    printControls();
   }
 
-  static void onSelectNext(Scene& scene) {
-    scene.selectNext();
-    SceneObject& sceneObject = scene.selected();
-    int waypointCount =
-        sceneObject.hasAnimation ? sceneObject.animation.waypointCount() : 0;
-    std::cout << "Selected: " << sceneObject.name
-              << "  waypoints: " << waypointCount << "\n";
+  static void onTransformKey(int key, int action, Scene& scene) {
+    if (action != GLFW_PRESS) return;
+    if (key == GLFW_KEY_TAB) {
+      scene.selectNext();
+      std::cout << "Selecionado: " << scene.selected().name << "\n";
+    }
+    const float step = 0.1f;
+    if (key == GLFW_KEY_EQUAL) {
+      scene.selected().scale *= (1.0f + step);
+      std::cout << scene.selected().name << " escala=" << scene.selected().scale << "\n";
+    }
+    if (key == GLFW_KEY_MINUS) {
+      scene.selected().scale *= (1.0f - step);
+      std::cout << scene.selected().name << " escala=" << scene.selected().scale << "\n";
+    }
   }
 
-  static void onAddWaypoint(Scene& scene, Camera& camera) {
-    SceneObject& sceneObject = scene.selected();
-    sceneObject.hasAnimation = true;
-    sceneObject.animation.addWaypoint(camera.pos);
-    std::cout << "Waypoint added to " << sceneObject.name
-              << "  total: " << sceneObject.animation.waypointCount() << "\n";
+  static void processTransformHeld(GLFWwindow* window, float dt,
+                                    SceneObject& obj) {
+    const float moveSpeed = 3.0f;
+    const float rotSpeed = 60.0f;
+    const float v = moveSpeed * dt;
+    const float r = rotSpeed * dt;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) obj.position.z -= v;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) obj.position.z += v;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) obj.position.x -= v;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) obj.position.x += v;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) obj.position.y += v;
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) obj.position.y -= v;
+
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) obj.rotation.y += r;
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) obj.rotation.y -= r;
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) obj.rotation.x += r;
+    if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS) obj.rotation.x -= r;
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) obj.rotation.z += r;
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) obj.rotation.z -= r;
+  }
+
+  static void onAnimationKey(int key, int action, Scene& scene,
+                              Camera& camera) {
+    if (action != GLFW_PRESS) return;
+    if (key == GLFW_KEY_SPACE) {
+      glm::vec3 waypoint = camera.pos + glm::normalize(camera.front) * 10.0f;
+      scene.selected().hasAnimation = true;
+      scene.selected().animation.addWaypoint(waypoint);
+      std::cout << "Waypoint adicionado em ("
+                << waypoint.x << ", " << waypoint.y << ", " << waypoint.z
+                << ")  total: " << scene.selected().animation.waypointCount() << "\n";
+    }
+    if (key == GLFW_KEY_TAB) {
+      scene.selectNext();
+      std::cout << "Selecionado: " << scene.selected().name << "\n";
+    }
+  }
+  static void onLightKey(int key, int action, Scene& scene) {
+    if (action != GLFW_PRESS) return;
+    if (scene.lights.empty()) return;
+    if (key == GLFW_KEY_TAB) {
+      selectedLight = (selectedLight + 1) % (int)scene.lights.size();
+      std::cout << "Luz " << selectedLight << " selecionada  intensidade="
+                << scene.lights[selectedLight].intensity << "\n";
+    }
+    const float step = 0.1f;
+    if (key == GLFW_KEY_EQUAL) {
+      scene.lights[selectedLight].intensity += step;
+      std::cout << "Luz " << selectedLight
+                << " intensidade=" << scene.lights[selectedLight].intensity << "\n";
+    }
+    if (key == GLFW_KEY_MINUS) {
+      scene.lights[selectedLight].intensity =
+          std::max(0.0f, scene.lights[selectedLight].intensity - step);
+      std::cout << "Luz " << selectedLight
+                << " intensidade=" << scene.lights[selectedLight].intensity << "\n";
+    }
+  }
+
+  static void processLightHeld(GLFWwindow* window, float dt, PointLight& light) {
+    const float speed = 3.0f;
+    const float v = speed * dt;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) light.position.z -= v;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) light.position.z += v;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) light.position.x -= v;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) light.position.x += v;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) light.position.y += v;
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) light.position.y -= v;
   }
 };
+
+inline AppMode InputHandler::mode = AppMode::Navigate;
+inline int InputHandler::selectedLight = 0;

@@ -41,7 +41,7 @@ class ShaderProgram {
   static std::string load(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
-      std::cerr << "ShaderProgram: cannot open " << path << "\n";
+      std::cerr << "ShaderProgram: nao foi possivel abrir " << path << "\n";
       return "";
     }
     std::ostringstream ss;
@@ -60,7 +60,7 @@ class ShaderProgram {
     if (!ok) {
       char log[512];
       glGetShaderInfoLog(shader, 512, nullptr, log);
-      std::cerr << "ShaderProgram compile error:\n" << log << "\n";
+      std::cerr << "ShaderProgram erro de compilacao:\n" << log << "\n";
     }
     return shader;
   }
@@ -76,7 +76,7 @@ class ShaderProgram {
     if (!ok) {
       char log[512];
       glGetProgramInfoLog(program, 512, nullptr, log);
-      std::cerr << "ShaderProgram link error:\n" << log << "\n";
+      std::cerr << "ShaderProgram erro de link:\n" << log << "\n";
     }
 
     glDeleteShader(vs);

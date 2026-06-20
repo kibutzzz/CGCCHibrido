@@ -4,7 +4,7 @@ skinparam classAttributeIconSize 0
 skinparam classFontStyle bold
 skinparam packageStyle rectangle
 
-class Material {
+struct Material {
     +ka: vec3
     +kd: vec3
     +ks: vec3
@@ -12,79 +12,70 @@ class Material {
     +texName: string
 }
 
-class PointLight {
+struct PointLight {
     +position: vec3
     +color: vec3
     +intensity: float
 }
 
-class ObjectLoader {
-    +loadOBJ(path): VAO
-    +loadMTL(path): Material
-    +loadTexture(path): GLuint
+struct AnimationPath {
+    +controlPoints: vector<vec3>
+    +waypointIndex: int
+    +segmentProgress: float
+    +speed: float
+    +update(dt: float)
+    +currentPosition(): vec3
+    +addWaypoint(point: vec3)
 }
 
-class SceneObject {
+struct SceneObject {
     +name: string
-    +vao: GLuint
-    +nVertices: int
+    +vertexArrayObject: GLuint
+    +vertexCount: int
     +material: Material
     +textureID: GLuint
     +position: vec3
     +rotation: vec3
     +scale: float
     +selected: bool
-    +animation: AnimationPath*
+    +hasAnimation: bool
+    +animation: AnimationPath
     +modelMatrix(): mat4
 }
 
-class Scene {
+struct Scene {
     +objects: vector<SceneObject>
     +lights: vector<PointLight>
-    +camera: Camera
     +selectedIndex: int
     +selectNext()
     +selectPrev()
+    +selected(): SceneObject&
 }
 
 class Camera {
-    +position: vec3
+    +pos: vec3
     +front: vec3
     +up: vec3
+    +yaw: float
+    +pitch: float
     +fov: float
     +near: float
     +far: float
+    +speed: float
+    +sensitivity: float
     +viewMatrix(): mat4
-    +projectionMatrix(aspect): mat4
-    +processKeyboard(direction, dt)
-    +processMouse(dx, dy)
-}
-
-class AnimationPath {
-    +controlPoints: vector<vec3>
-    +t: float
-    +update(dt)
-    +currentPosition(): vec3
-}
-
-class SceneLoader {
-    +load(path): Scene
-}
-
-class InputHandler {
-    +onKey(key, scene)
-    +onMouseMove(dx, dy, camera)
+    +projectionMatrix(aspect: float): mat4
+    +processKeyboard(window: GLFWwindow*, dt: float)
+    +processMouse(xpos: double, ypos: double)
+    +processScroll(yoffset: double)
 }
 
 class Window {
     +window: GLFWwindow*
-    +width: int
-    +height: int
     +Window(width, height, title)
     +shouldClose(): bool
     +swapBuffers()
     +pollEvents()
-    +setKeyCallback(fn)
 }
 
 class ShaderProgram {
@@ -98,23 +89,46 @@ class ShaderProgram {
 }
 
 class PhongShader {
-    +PhongShader()
-    +setLights(lights)
-    +setMaterial(material)
-    +setCameraPos(pos)
+    +PhongShader(vertPath, fragPath)
+    +setLights(lights: vector<PointLight>)
+    +setMaterial(material: Material)
+    +setCameraPos(pos: vec3)
+    +setSelectionBrightness(b: float)
+}
+
+note as MeshNote
+    Free functions in Mesh.h:
+    loadSimpleOBJ(path, nVertices, mtlFile): GLuint
+    loadMTL(path): Material
+    loadTexture(path): GLuint
+end note
+
+note as LoaderNote
+    Free function in SceneLoader.h:
+    loadScene(scenePath, assetsDir, scene, camera)
+end note
+
+class InputHandler <<static>> {
+    +mode: AppMode
+    +onKey(window, key, action, mods, scene, camera)
+    +onMouseMove(xpos, ypos, camera)
+    +onScroll(yoffset, camera)
+    +processHeldKeys(window, dt, scene, camera)
+    +showCrosshair(): bool
 }
 
 PhongShader --|> ShaderProgram
 
 Scene "1" *-- "many" SceneObject
 Scene "1" *-- "many" PointLight
-Scene "1" *-up- "1" Camera
-Scene "1" *-- "1" ShaderProgram
-SceneObject "1" o-- "0..1" AnimationPath
 SceneObject "1" *-- "1" Material
-SceneLoader ..> Scene : creates
+SceneObject "1" *-- "1" AnimationPath
+
+LoaderNote ..> Scene : fills
+LoaderNote ..> Camera : fills
+MeshNote ..> SceneObject : feeds
+
 InputHandler ..> Scene : mutates
 InputHandler ..> Camera : mutates
-ObjectLoader ..> SceneObject : feeds
 
 @enduml

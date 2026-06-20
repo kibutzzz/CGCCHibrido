@@ -35,6 +35,14 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(stb_image)
 
+# nlohmann/json for scene loading
+FetchContent_Declare(
+  nlohmann_json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 # Adiciona as pastas de cabeçalhos
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/common)
@@ -120,4 +128,10 @@ add_executable(TarefaM6 tarefa-m6/main.cpp ${GLAD_C_FILE})
 target_include_directories(TarefaM6 PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${CMAKE_SOURCE_DIR}/Common ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
 target_compile_definitions(TarefaM6 PRIVATE SHADERS_DIR="${CMAKE_SOURCE_DIR}/tarefa-m6/" ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/Modelos3D/")
 target_link_libraries(TarefaM6 glfw ${OPENGL_LIBS})
+
+# Grau B
+add_executable(GrauB grau-b/main.cpp ${GLAD_C_FILE})
+target_include_directories(GrauB PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${CMAKE_SOURCE_DIR}/Common ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
+target_compile_definitions(GrauB PRIVATE SHADERS_DIR="${CMAKE_SOURCE_DIR}/grau-b/" ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets/Modelos3D/" SCENE_FILE="${CMAKE_SOURCE_DIR}/grau-b/scene.json")
+target_link_libraries(GrauB glfw ${OPENGL_LIBS} nlohmann_json::nlohmann_json)
 
