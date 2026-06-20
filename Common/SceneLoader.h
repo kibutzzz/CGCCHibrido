@@ -33,7 +33,7 @@ static void loadScene(const std::string& scenePath,
                       Camera& camera) {
   std::ifstream file(scenePath);
   if (!file.is_open()) {
-    std::cerr << "SceneLoader: cannot open " << scenePath << "\n";
+    std::cerr << "SceneLoader: nao foi possivel abrir " << scenePath << "\n";
     return;
   }
 

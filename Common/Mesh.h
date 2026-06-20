@@ -37,7 +37,7 @@ GLuint loadTexture(const std::string& filePath) {
                  data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
-    std::cerr << "Mesh: failed to load texture: " << filePath << "\n";
+    std::cerr << "Mesh: falha ao carregar textura: " << filePath << "\n";
   }
   stbi_image_free(data);
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -48,7 +48,7 @@ Material loadMTL(const std::string& filePath) {
   Material mat;
   std::ifstream file(filePath);
   if (!file.is_open()) {
-    std::cerr << "Mesh: failed to open MTL: " << filePath << "\n";
+    std::cerr << "Mesh: falha ao abrir MTL: " << filePath << "\n";
     return mat;
   }
 
@@ -116,7 +116,7 @@ GLuint loadSimpleOBJ(const std::string& filePath, int& nVertices,
 
   std::ifstream file(filePath);
   if (!file.is_open()) {
-    std::cerr << "Mesh: failed to open OBJ: " << filePath << "\n";
+    std::cerr << "Mesh: falha ao abrir OBJ: " << filePath << "\n";
     return (GLuint)-1;
   }
 

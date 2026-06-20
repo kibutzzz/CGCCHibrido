@@ -25,7 +25,7 @@ class Window {
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-      std::cerr << "Failed to initialize GLAD\n";
+      std::cerr << "Falha ao inicializar GLAD\n";
     }
 
     int fbWidth, fbHeight;

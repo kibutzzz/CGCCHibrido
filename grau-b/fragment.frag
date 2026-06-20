@@ -23,7 +23,7 @@ void main() {
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < numLights; i++) {
     vec3 lightDirection = normalize(lightPositions[i] - fragmentPosition);
     vec3 reflectionDirection = reflect(-lightDirection, normal);
 

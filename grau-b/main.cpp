@@ -63,16 +63,9 @@ int main() {
   glfwSetScrollCallback(window.window, scrollCallback);
   glfwSetInputMode(window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-  std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
-  std::cout << "OpenGL:   " << glGetString(GL_VERSION) << "\n";
-  std::cout << "\n=== Controles ===\n"
-            << "Esc      : modo navegar (camara livre)\n"
-            << "1        : modo transformar (Tab=selecionar)\n"
-            << "           WASD=mover XZ  I/J=mover Y  +/-=escala\n"
-            << "           U/O=yaw  K/;=pitch  N/M=roll\n"
-            << "2        : modo animacao (Space=waypoint 10u a frente)\n"
-            << "3        : modo luz (Tab=selecionar  +/-=intensidade  WASDIJ=posicao)\n"
-            << "=================\n\n";
+  std::cout << "Renderizador: " << glGetString(GL_RENDERER) << "\n";
+  std::cout << "OpenGL:       " << glGetString(GL_VERSION) << "\n";
+  InputHandler::printControls();
 
   glEnable(GL_DEPTH_TEST);
 
@@ -97,10 +90,10 @@ int main() {
   globalScene = &scene;
   globalCamera = &camera;
 
-  std::cout << "Scene loaded: " << scene.objects.size() << " object(s)\n";
+  std::cout << "Cena carregada: " << scene.objects.size() << " objeto(s)\n";
   for (auto& obj : scene.objects)
     std::cout << "  " << obj.name << "\n";
-  std::cout << "Selected: " << scene.selected().name << "\n\n";
+  std::cout << "Selecionado: " << scene.selected().name << "\n\n";
 
   float previousTime = (float)glfwGetTime();
 

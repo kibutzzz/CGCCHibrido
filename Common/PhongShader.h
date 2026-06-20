@@ -17,6 +17,7 @@ class PhongShader : public ShaderProgram {
   }
 
   void setLights(const std::vector<PointLight>& lights) const {
+    setInt("numLights", (int)lights.size());
     for (int i = 0; i < (int)lights.size(); i++) {
       setVec3("lightPositions[" + std::to_string(i) + "]", lights[i].position);
       setVec3("lightColors[" + std::to_string(i) + "]", lights[i].color * lights[i].intensity);

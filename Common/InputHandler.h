@@ -69,35 +69,39 @@ class InputHandler {
     return mode == AppMode::Animation || mode == AppMode::Light;
   }
 
+  static void printControls() {
+    std::cout << "\n=== Controles ===\n"
+              << "Esc      : modo navegar (camara livre)\n"
+              << "           mouse=olhar  WASD=mover  scroll=zoom\n"
+              << "1        : modo transformar (Tab=selecionar)\n"
+              << "           WASD=mover XZ  I/J=mover Y  +/-=escala\n"
+              << "           U/O=yaw  K/;=pitch  N/M=roll\n"
+              << "2        : modo animacao (Tab=selecionar  Space=waypoint 10u a frente)\n"
+              << "3        : modo luz (Tab=selecionar  +/-=intensidade  WASDIJ=posicao)\n"
+              << "=================\n\n";
+  }
+
  private:
   static void setMode(AppMode m, GLFWwindow* window) {
     mode = m;
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    if (m == AppMode::Navigate) {
-      std::cout << "[mode] navigate\n";
-    } else if (m == AppMode::Transform) {
-      std::cout << "[mode] transform  (WASD=XZ  I/J=Y  U/O=yaw  K/;=pitch  N/M=roll  +/-=scale)\n";
-    } else if (m == AppMode::Animation) {
-      std::cout << "[mode] animation  (Space=add waypoint 10u ahead)\n";
-    } else if (m == AppMode::Light) {
-      std::cout << "[mode] light  (Tab=select  +/-=intensity  WASD=XZ  I/J=Y)\n";
-    }
+    printControls();
   }
 
   static void onTransformKey(int key, int action, Scene& scene) {
     if (action != GLFW_PRESS) return;
     if (key == GLFW_KEY_TAB) {
       scene.selectNext();
-      std::cout << "Selected: " << scene.selected().name << "\n";
+      std::cout << "Selecionado: " << scene.selected().name << "\n";
     }
     const float step = 0.1f;
     if (key == GLFW_KEY_EQUAL) {
       scene.selected().scale *= (1.0f + step);
-      std::cout << scene.selected().name << " scale=" << scene.selected().scale << "\n";
+      std::cout << scene.selected().name << " escala=" << scene.selected().scale << "\n";
     }
     if (key == GLFW_KEY_MINUS) {
       scene.selected().scale *= (1.0f - step);
-      std::cout << scene.selected().name << " scale=" << scene.selected().scale << "\n";
+      std::cout << scene.selected().name << " escala=" << scene.selected().scale << "\n";
     }
   }
 
@@ -130,13 +134,13 @@ class InputHandler {
       glm::vec3 waypoint = camera.pos + glm::normalize(camera.front) * 10.0f;
       scene.selected().hasAnimation = true;
       scene.selected().animation.addWaypoint(waypoint);
-      std::cout << "Waypoint added at ("
+      std::cout << "Waypoint adicionado em ("
                 << waypoint.x << ", " << waypoint.y << ", " << waypoint.z
                 << ")  total: " << scene.selected().animation.waypointCount() << "\n";
     }
     if (key == GLFW_KEY_TAB) {
       scene.selectNext();
-      std::cout << "Selected: " << scene.selected().name << "\n";
+      std::cout << "Selecionado: " << scene.selected().name << "\n";
     }
   }
   static void onLightKey(int key, int action, Scene& scene) {
@@ -144,20 +148,20 @@ class InputHandler {
     if (scene.lights.empty()) return;
     if (key == GLFW_KEY_TAB) {
       selectedLight = (selectedLight + 1) % (int)scene.lights.size();
-      std::cout << "Light " << selectedLight << " selected  intensity="
+      std::cout << "Luz " << selectedLight << " selecionada  intensidade="
                 << scene.lights[selectedLight].intensity << "\n";
     }
     const float step = 0.1f;
     if (key == GLFW_KEY_EQUAL) {
       scene.lights[selectedLight].intensity += step;
-      std::cout << "Light " << selectedLight
-                << " intensity=" << scene.lights[selectedLight].intensity << "\n";
+      std::cout << "Luz " << selectedLight
+                << " intensidade=" << scene.lights[selectedLight].intensity << "\n";
     }
     if (key == GLFW_KEY_MINUS) {
       scene.lights[selectedLight].intensity =
           std::max(0.0f, scene.lights[selectedLight].intensity - step);
-      std::cout << "Light " << selectedLight
-                << " intensity=" << scene.lights[selectedLight].intensity << "\n";
+      std::cout << "Luz " << selectedLight
+                << " intensidade=" << scene.lights[selectedLight].intensity << "\n";
     }
   }
 
