@@ -36,7 +36,6 @@ void scrollCallback(GLFWwindow*, double, double yoffset) {
 }
 
 static GLuint buildCrosshairVAO() {
-  // Two lines: horizontal and vertical, each 2 vertices in NDC
   float crosshair[] = {
     -0.02f,  0.0f, 0.0f,
      0.02f,  0.0f, 0.0f,

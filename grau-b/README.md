@@ -2,6 +2,10 @@
 
 Cena 3D interativa com iluminação Phong, câmera em primeira pessoa e animação por waypoints.
 
+## Demo
+
+https://github.com/kibutzzz/CGCCHibrido/blob/main/grau-b/grau-b.mp4
+
 ## Compilar
 
 Na raiz do repositório `CGCCHibrido`:
